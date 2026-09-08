@@ -1,0 +1,22 @@
+{
+  "plugins": {},
+  "filters": {},
+  "rules": {
+    "no-mix-dearu-desumasu": true,
+    "no-doubled-joshi": true,
+    "no-double-negative-ja": true,
+    "ja-no-weak-phrase": true,
+    "ja-no-redundant-expression": true,
+    "ja-no-abusage": true,
+    "no-mixed-zenkaku-and-hankaku-alphabet": true,
+    "no-dropping-the-ra": true,
+    "no-doubled-conjunctive-particle-ga": true,
+    "no-doubled-conjunction": true,
+    "ja-no-mixed-period": true,
+    "ja-unnatural-alphabet": true,
+    "@textlint-ja/textlint-rule-no-insert-dropping-sa": true,
+    "prefer-tari-tari": true,
+    "@textlint-ja/no-synonyms": true,
+    "@textlint-ja/no-filler": true
+  }
+}
