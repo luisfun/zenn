@@ -1,5 +1,5 @@
 ---
-title: "Edge で動く Discord Bot ライブラリを作った - discord-hono" # 記事のタイトル
+title: "Edgeで動くDiscord Botライブラリを作った - discord-hono" # 記事のタイトル
 emoji: "🔥" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア記事
 topics: ["discord", "typescript", "hono"] # タグ。["markdown", "rust", "aws"]のように指定する
