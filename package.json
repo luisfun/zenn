@@ -4,8 +4,8 @@
   "scripts": {
     "new": "zenn new:article",
     "dev": "zenn preview",
-    "fix": "textlint . --fix",
-    "lint": "textlint ."
+    "fix": "textlint \"*/*.md\" --fix",
+    "lint": "textlint \"*/*.md\""
   },
   "dependencies": {
     "textlint": "^15.8.0",
