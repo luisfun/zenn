@@ -10,7 +10,11 @@ Discord Botを作るとき、まず名前が挙がるライブラリのひとつ
 
 一方で、スラッシュコマンドやボタンへの応答が中心のBotなら、常時接続を維持しなくても実現できます。DiscordのInteractionsをHTTPリクエストとして受け取り、処理してレスポンスを返すだけです。
 
-この形に合わせて、Cloudflare Workers向けのDiscord Botライブラリ [discord-hono](https://github.com/luisfun/discord-hono) を作りました。この記事では、作った背景、設計上の工夫、そして簡単なBotを動かすまでを紹介します。
+この形に合わせて、Cloudflare Workers向けのDiscord Botフレームワーク [discord-hono] を作りました。
+
+https://github.com/luisfun/discord-hono
+
+この記事では、作った背景、設計上の工夫、そして簡単なBotを動かすまでを紹介します。
 
 ## なぜ作ったか
 
