@@ -1,50 +1,32 @@
 ---
-title: "Edgeで動くDiscord Botライブラリを作った - discord-hono" # 記事のタイトル
+title: "Edgeで動くDiscord Botフレームワークを作ってる - discord-hono" # 記事のタイトル
 emoji: "🔥" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア記事
 topics: ["discord", "typescript", "hono"] # タグ。["markdown", "rust", "aws"]のように指定する
 published: false # 公開設定（falseにすると下書き）
 ---
 
-Discord Botを作るとき、まず名前が挙がるライブラリのひとつが [discord.js](https://discord.js.org/) です。豊富な機能と大きなエコシステムがあり、Gatewayに接続してイベントを受け取るBotにとって心強い選択肢です。
-
-しかし、discord.jsのBotは、Gatewayとの接続を維持するためサーバーを常時稼働させておく必要があります。これは、小さなBotを作るときの負担になると思いました。
-
-また、この頃私自身がCloudflareキッズ（オジ）として、Discord BotもCloudflareで動かせないか考えていました。
-
-そこで、Botを手軽に作れるように、Cloudflare Workers向けのDiscord Botフレームワーク [discord-hono] を作りました。
+🤏 I have a Hono ~
+🫱 I have a Discord ~
+🫸🫷 **Discord Hono**
 
 https://github.com/luisfun/discord-hono
 
-この記事では、作った背景、設計上の工夫、そして簡単なBotを動かすまでを紹介します。
+## これは何？
 
-## なぜ作ったか
+- Discord Bot作りたいな～
+- Cloudflare Workersに載せたいな～
+- Honoっぽい書き方がいいな～
 
-### 開発に至った背景
+こういった願望から生まれた、エッジ向けのDiscord Botフレームワークです。
 
-これまでDiscord Botを作るときは、Node.jsのプロセスを起動し、Discord Gatewayへ接続する構成が自然でした。しかし、コマンドに応答するだけのBotでは、実際に必要なのは次のような処理です。
+### もう少し詳しく
 
-1. DiscordからHTTPリクエストを受け取る
-2. リクエストがDiscordから来たものか検証する
-3. コマンドに対応する処理を実行する
-4. Interactionへのレスポンスを返す
+Discord Botを作るには、discord.jsやdiscrod.pyなど使うのが有名です。これらのフレームワークは、Gateway接続を維持するためのサーバーが必要でした。しかし弱点として、小さなBotでもサーバーの管理が必要になり、無料で作ろうとすると少し複雑な状況でした。
 
-この用途に、常時起動するサーバーやGateway接続は必須ではありません。Cloudflare Workersのようなエッジ環境なら、リクエストが来たときだけコードを実行できます。
+そこで、Discord Botをサーバレスなエッジ環境（特にCloudflare Workers）で稼働できないか調べたところ、周辺ツールはあるものの、簡単に作るためのフレームワークが調べた範囲ではありませんでした。
 
-ただし、DiscordのInteractionを自分でルーティングし、レスポンスのJSONや署名検証まで実装すると、Bot本体よりも周辺処理が目立ちます。Honoのようにリクエストを受けてハンドラを書く感覚で、Discord Botを作れるライブラリが欲しくなりました。こうしてdiscord-honoの開発を始めました。
-
-### エッジ環境でBotを動かす利点
-
-Cloudflare WorkersにデプロイしたBotは、特定のサーバーを自分で管理する必要がありません。リクエストはCloudflareのネットワーク上で処理され、アプリケーションはHTTPの入口だけを持ちます。
-
-この構成には、次のような利点があります。
-
-- サーバーの起動、監視、OSの更新が不要
-- Bot用プロセスを常時起動しておく必要がない
-- 世界中のエッジからリクエストを受けられる
-- 小規模なBotなら、Cloudflare Workersの無料枠で運用できる
-
-もちろん無料枠にはリクエスト数や実行時間などの制限があります。また、外部APIやデータベースを使えば、そのサービスの料金も発生します。「サーバー代0円」は、無料枠の範囲に収まる小規模なBotを想定した表現です。
+また、プロジェクトを立ち上げた当初、Honoの設計思想をとても良く思っており、私も同様の思想でフレームワークを作りたいと思いました。
 
 ## 設計思想と技術的な工夫
 
