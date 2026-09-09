@@ -6,11 +6,13 @@ topics: ["discord", "typescript", "hono"] # タグ。["markdown", "rust", "aws"]
 published: false # 公開設定（falseにすると下書き）
 ---
 
-Discord Botを作るとき、まず名前が挙がるライブラリのひとつが [discord.js](https://discord.js.org/) です。豊富な機能と大きなエコシステムがあり、Gatewayに接続してイベントを受け取るBotにはとても心強い選択肢です。
+Discord Botを作るとき、まず名前が挙がるライブラリのひとつが [discord.js](https://discord.js.org/) です。豊富な機能と大きなエコシステムがあり、Gatewayに接続してイベントを受け取るBotにとって心強い選択肢です。
 
-一方で、スラッシュコマンドやボタンへの応答が中心のBotなら、常時接続を維持しなくても実現できます。DiscordのInteractionsをHTTPリクエストとして受け取り、処理してレスポンスを返すだけです。
+しかし、discord.jsのBotは、Gatewayとの接続を維持するためサーバーを常時稼働させておく必要があります。これは、小さなBotを作るときの負担になると思いました。
 
-この形に合わせて、Cloudflare Workers向けのDiscord Botフレームワーク [discord-hono] を作りました。
+また、この頃私自身がCloudflareキッズ（オジ）として、Discord BotもCloudflareで動かせないか考えていました。
+
+そこで、Botを手軽に作れるように、Cloudflare Workers向けのDiscord Botフレームワーク [discord-hono] を作りました。
 
 https://github.com/luisfun/discord-hono
 
@@ -29,7 +31,7 @@ https://github.com/luisfun/discord-hono
 
 この用途に、常時起動するサーバーやGateway接続は必須ではありません。Cloudflare Workersのようなエッジ環境なら、リクエストが来たときだけコードを実行できます。
 
-ただし、DiscordのInteractionを自分でルーティングし、レスポンスのJSONや署名検証まで実装すると、Bot本体より周辺処理が目立ちます。Honoのようにリクエストを受けてハンドラを書く感覚で、Discord Botを作れるライブラリが欲しくなりました。こうしてdiscord-honoの開発を始めました。
+ただし、DiscordのInteractionを自分でルーティングし、レスポンスのJSONや署名検証まで実装すると、Bot本体よりも周辺処理が目立ちます。Honoのようにリクエストを受けてハンドラを書く感覚で、Discord Botを作れるライブラリが欲しくなりました。こうしてdiscord-honoの開発を始めました。
 
 ### エッジ環境でBotを動かす利点
 
