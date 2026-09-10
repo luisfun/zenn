@@ -75,13 +75,13 @@ Discord Interactions APIへのレスポンスにはレート制限がなく、Cl
 
 ## 使い方やコード例
 
-ドキュメントやコード例もいくつか作ってあるので、そちらを参考にしてください。
+ドキュメントやコード例も用意しているので、詳しくはそちらをご覧ください。
 
 https://discord-hono.luis.fun/ja/guides/start/
 
 https://github.com/luisfun/discord-hono-examples
 
-リンクだけだと味気ないので、リンクのコード例をそのまま載せておきます。
+リンクだけでは少し味気ないので、ここではリンク先のコード例をそのまま紹介します。
 
 ### デプロイ用コード
 
@@ -93,6 +93,6 @@ https://github.com/luisfun/discord-hono-examples/blob/main/workerd-hello-world/s
 
 ## 終わりに
 
-小さなBotを無料で運用したい人は、ぜひDiscord Honoを検討してみてください。もし使ってみて気に入ったらリポジトリへスターを付けてくれると嬉しいです。
+小さなBotを無料で運用したい方は、ぜひDiscord Honoを検討してみてください。実際に使ってみて気に入っていただけたら、リポジトリにスターを付けていただけると嬉しいです。
 
 https://github.com/luisfun/discord-hono
