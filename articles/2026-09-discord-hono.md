@@ -18,7 +18,7 @@ https://github.com/luisfun/discord-hono
 - Cloudflare Workersに載せたいな～
 - Honoっぽい書き方がいいな～
 
-そんな思いから生まれたのが、エッジ環境向けのDiscord Botフレームワークです。
+そんな思いから生まれたのが、このDiscord Honoです。
 
 ### もう少し詳しく
 
@@ -26,96 +26,28 @@ Discord Botを作るには、discord.jsやdiscord.pyなどのフレームワー�
 
 そこで、Discord Botをサーバレスなエッジ環境、特にCloudflare Workersで動かせないか調べました。周辺ツールはいくつか見つかりましたが、手軽にBotを作るためのフレームワークは見当たりませんでした。
 
-また、プロジェクトを立ち上げた当初から、Honoの設計思想に魅力を感じていました。そこで、同じような思想でDiscord Bot向けのフレームワークを作ることにしました。
+また、プロジェクトを立ち上げた当初から、Honoの設計思想に魅力を感じていました。そこで、同じような思想でフレームワークを作ることにしました。
 
-## 設計思想と技術的な工夫
+## 設計思想
 
-### Honoライクな書き方
+- サイズと処理の軽量化
+- 実行時の依存関係なし
+- TypescriptでDevXを提供
 
-discord-honoの中心は `DiscordHono` クラスです。コマンド名とハンドラをチェーンで登録できます。
+これらを基本的な設計思想とし、Honoライクなコーディング体験になるよう設計しました。
 
 ```ts
 import { DiscordHono } from 'discord-hono'
 
 const app = new DiscordHono()
-	.command('hello', c => c.res('Hello, World!'))
-	.command('about', c => c.res('discord-honoで動いています'))
+  .command('hello', c => c.res('Hello, world!'))
+  .command('about', c => c.res('discord-honoで動いています'))
 
 export default app
 ```
 
-Cloudflare Workersのエントリポイントとして `app` をそのままexportできます。ハンドラに渡されるコンテキストからは、Interactionのデータや環境変数、Discord REST APIを呼び出すための機能にアクセスできます。
-
-ボタンやモーダルにも同じ考え方を適用できます。
-
-```ts
-import { DiscordHono, makeActionRow, makeButton } from 'discord-hono'
-
-const app = new DiscordHono()
-	.command('hello', c =>
-		c.res({
-			content: 'ボタンを押してください',
-			components: [makeActionRow([makeButton('delete', ['削除', 'Delete'])])],
-		}),
-	)
-	.component('delete', c => c.update().res('削除しました'))
-
-export default app
-```
-
-### 型を担保する
-
-DiscordのInteractionやコンポーネントには、種類ごとに異なるデータ構造があります。discord-honoでは、Discordが提供する `discord-api-types` を利用し、コマンド、コンポーネント、オートコンプリート、モーダルなどのハンドラに型を付けています。
-
-たとえばスラッシュコマンドのオプションは、Builderで定義した内容に沿って扱えます。
-
-```ts
-import { DiscordHono, makeSlashCommand, makeStringOption } from 'discord-hono'
-
-const command = makeSlashCommand(
-	'hello',
-	'挨拶する',
-	makeStringOption('name', '名前', { required: true }),
-)
-
-const app = new DiscordHono()
-	.command(command.name, c => {
-		const name = c.var.options.name
-		return c.res(`Hello, ${name}!`)
-	})
-
-export default app
-```
-
-実際のBuilderの引数やコンテキストのプロパティはバージョンによって変わるため、利用時には[公式ドキュメント](https://discord-hono.luis.fun/)とエディタの型情報を確認してください。ライブラリの目的は、DiscordのJSONを直接扱う箇所をできるだけ減らすことです。
-
-### Ed25519署名の検証
-
-DiscordのInteractions Endpointには、次のヘッダーが付いてきます。
-
-- `x-signature-ed25519`: 署名
-- `x-signature-timestamp`: 署名に使われたタイムスタンプ
-
-検証対象は、タイムスタンプとリクエスト本文を連結したバイト列です。アプリケーションの公開鍵を使ってEd25519署名を検証し、検証に失敗したリクエストはハンドラへ渡しません。
-
-discord-honoでは、この処理をCloudflare Workersで利用できるWeb Crypto APIの `crypto.subtle` で行っています。
-
-```ts
-const verified = await crypto.subtle.verify(
-	{ name: 'Ed25519' },
-	await crypto.subtle.importKey(
-		'raw',
-		publicKeyBytes,
-		{ name: 'Ed25519' },
-		false,
-		['verify'],
-	),
-	signatureBytes,
-	new TextEncoder().encode(timestamp + body),
-)
-```
-
-Node.js用の暗号ライブラリを持ち込まず、Workersの標準APIだけで完結するのがポイントです。本文は検証前に `request.text()` で読み、その同じ本文を検証とJSONパースに使います。署名検証のために本文を書き換えないことも重要です。
+コード例にある`'hello'`や`'about'`が、それぞれのコマンド名に当たります。
+Honoらしい書き心地になっているのではないでしょうか。
 
 ## discord-honoが解決する世界
 
