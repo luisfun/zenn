@@ -61,122 +61,38 @@ Honoらしい書き心地になっているのではないでしょうか。
 
 ### Botとしてできること
 
-Discord Honoで利用できる機能には、いくつか制限があります。Gatewayへ接続しない仕組みのため、Gatewayに依存する機能は利用できません。
-ただし、1サーバー内のチャット監視であれば、1分ごとのcronとREST APIを組み合わせることで、疑似的に実現できます。
+Discord Honoで利用できる機能には、いくつか制限があります。Gatewayへ接続しない仕組みのため、Gatewayに依存する機能は利用できません。ただし、1サーバー内のチャット監視であれば、1分ごとのcronとREST APIを組み合わせることで、疑似的に実現できます。
 
 ### コストについて
 
-Cloudflare Workersにデプロイすれば、無料枠に収まるケースも多く、サーバー代をかけずに運用できます。
-また、コールドスタートもほぼゼロのため、スリープ対策として別のコードを実行する必要はありません。
+Cloudflare Workersにデプロイすれば、無料枠に収まるケースも多く、サーバー代をかけずに運用できます。また、コールドスタートもほぼゼロのため、スリープ対策として別のコードを実行する必要はありません。
 
 ### スケーリングについて
 
 大規模なBotでの検証はできていないため、ここでの評価は理論上のものです。
 
-Discord Interactions APIへのレスポンスにはレート制限がなく、Cloudflare Workersも実質的に無制限にスケールできます。
-レート制限で気にするのは、followupを含めるREST APIの利用や、Workerの背後に接続するデータベースやストレージです。
+Discord Interactions APIへのレスポンスにはレート制限がなく、Cloudflare Workersも実質的に無制限にスケールできます。レート制限で気にするのは、followupを含めるREST APIの利用や、Workerの背後に接続するデータベースやストレージです。
 
-## ハンズオン: Hello World Bot
+## 使い方やコード例
 
-ここでは、`/hello` に応答するBotをCloudflare Workersへデプロイします。
+ドキュメントやコード例もいくつか作ってあるので、そちらを参考にしてください。
 
-### 1. プロジェクトを作成する
+https://discord-hono.luis.fun/ja/guides/start/
 
-Cloudflare Workersのプロジェクトを作成し、ライブラリをインストールします。
+https://github.com/luisfun/discord-hono-examples
 
-```sh
-npm create cloudflare@latest discord-hono-hello
-cd discord-hono-hello
-npm i discord-hono
-npm i -D discord-api-types
-```
+リンクだけだと味気ないので、リンクのコード例をそのまま載せておきます。
 
-TypeScriptを使う構成を選択してください。
+### デプロイ用コード
 
-### 2. Workerを書く
+https://github.com/luisfun/discord-hono-examples/blob/main/workerd-hello-world/src/index.ts
 
-`src/index.ts` を次の内容にします。
+### コマンド登録用コード
 
-```ts
-import { DiscordHono } from 'discord-hono'
-
-const app = new DiscordHono()
-	.command('hello', c => c.res('Hello, World!'))
-
-export default app
-```
-
-`DiscordHono` は `fetch` を持つWorkerとして動作します。GETリクエストには稼働確認用のレスポンスを返し、POSTリクエストでは署名検証後にInteractionを処理します。
-
-### 3. Discordのコマンドを登録する
-
-コマンドの登録は、Worker本体とは別のスクリプトで一度実行します。`src/register.ts` を作成します。
-
-```ts
-import { makeSlashCommand, register } from 'discord-hono'
-
-const commands = [
-	makeSlashCommand('hello', 'Hello, World!'),
-]
-
-register(
-	commands,
-	process.env.DISCORD_APPLICATION_ID,
-	process.env.DISCORD_TOKEN,
-)
-```
-
-`package.json` に登録用スクリプトを追加します。
-
-```json
-{
-	"type": "module",
-	"scripts": {
-		"register": "tsc && node --env-file=.env dist/register.js",
-		"deploy": "wrangler deploy"
-	}
-}
-```
-
-### 4. Discordアプリを設定する
-
-[Discord Developer Portal](https://discord.com/developers/applications)でアプリケーションを作成し、次の値を取得します。
-
-- Application ID
-- Public Key
-- Bot Token
-
-ローカル登録用の `.env` に値を設定します。
-
-```dotenv
-DISCORD_APPLICATION_ID=アプリケーションID
-DISCORD_PUBLIC_KEY=公開鍵
-DISCORD_TOKEN=Botトークン
-```
-
-`.env` はリポジトリへコミットしません。`npm run register` で `/hello` コマンドを登録できます。テスト用のGuild IDを指定して登録すると、反映を確認しやすくなります。
-
-### 5. デプロイしてEndpointを設定する
-
-```sh
-npx wrangler secret put DISCORD_APPLICATION_ID
-npx wrangler secret put DISCORD_PUBLIC_KEY
-npx wrangler secret put DISCORD_TOKEN
-npm run deploy
-```
-
-`wrangler secret put` はそれぞれのコマンドで値を入力します。デプロイ後に表示されたWorkerのURLを、Discord Developer Portalの **Interactions Endpoint URL** に設定してください。
-
-設定が完了すると、Discordから送られた `/hello` にWorkerが応答します。Discord側の検証リクエストが成功しない場合は、Endpoint URL、`DISCORD_PUBLIC_KEY`、そしてWorkerに設定したSecretを確認します。
+https://github.com/luisfun/discord-hono-examples/blob/main/workerd-hello-world/src/register.ts
 
 ## 終わりに
 
-discord-honoは、Discord Botを常時接続するプロセスではなく、HTTPリクエストを処理するWorkerとして捉え直すためのライブラリです。
+小さなBotを無料で運用したい人は、ぜひDiscord Honoを検討してみてください。もし使ってみて気に入ったらリポジトリへスターを付けてくれると嬉しいです。
 
-Honoに影響を受けたAPIとTypeScriptによる型の担保を用意しました。Workers標準のWeb Crypto APIで署名も検証します。DiscordのInteractionに集中してコードを書ける設計です。
-
-すべてのBotをHTTP型に置き換えられるわけではありません。音声やGatewayイベントが必要ならdiscord.jsが自然です。一方、コマンドやコンポーネントへの応答が中心なら、エッジ環境で小さく始められるdiscord-honoを選択肢にできます。
-
-- [discord-honoのGitHubリポジトリ](https://github.com/luisfun/discord-hono)
-- [公式ドキュメント](https://discord-hono.luis.fun/)
-- [サンプルリポジトリ](https://github.com/luisfun/discord-hono-examples)
+https://github.com/luisfun/discord-hono
