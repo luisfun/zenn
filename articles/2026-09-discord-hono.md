@@ -71,7 +71,7 @@ Cloudflare Workersにデプロイすれば、無料枠に収まるケースも�
 
 大規模なBotでの検証はできていないため、ここでの評価は理論上のものです。
 
-Discord Interactions APIへのレスポンスにはレート制限がなく、Cloudflare Workersも実質的に無制限にスケールできます。レート制限で気にするのは、followupを含めるREST APIの利用や、Workerの背後に接続するデータベースやストレージです。
+Discord Interactions APIへのレスポンスにはレート制限がなく、Cloudflare Workersも実質的に無制限にスケールできます。レート制限で気にするのは、REST APIの利用やWorkerの背後に接続するデータベースやストレージです。
 
 ### Honoに組み込めます
 
